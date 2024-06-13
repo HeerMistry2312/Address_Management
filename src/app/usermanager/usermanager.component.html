@@ -1,0 +1,153 @@
+<div class="container d-flex m-5">
+  <div class="container bg-light border-rounded shadow m-2">
+    <div class="header text-center">
+      <h2>User Address Management</h2>
+    </div>
+    <form action="" [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
+      <div class="row justify-content-center m-2">
+        <div class="col-lg-4">
+          <label for="userid"><b>userID</b></label>
+          <input type="number" name="userid" id="userid" class="form-control" formControlName="userid">
+          <ng-container *ngIf="reactiveForm.get('userid').touched">
+            <small *ngIf="reactiveForm.get('userid').hasError('required'); else maxLength">
+              *UserId is required
+            </small>
+            <ng-template #maxLength>
+              <small *ngIf="reactiveForm.get('userid').hasError('maxLength');">
+                *UserId Max Length Should be 3
+              </small>
+            </ng-template>
+          </ng-container>
+        </div>
+        <div class="col-lg-4">
+          <label for="username"><b>UserName</b></label>
+          <input type="text" name="username" id="username" class="form-control" formControlName="username">
+          <ng-container *ngIf="reactiveForm.get('username').touched">
+            <small *ngIf="reactiveForm.get('username').hasError('required'); else pattern">
+              *Username is required
+            </small>
+            <ng-template #pattern>
+              <small *ngIf="reactiveForm.get('username').hasError('pattern');">
+                *Username Must be start with characters andfollowing digits
+              </small>
+            </ng-template>
+          </ng-container>
+        </div>
+        <div class="col-lg-4">
+          <label for="email"><b>Email</b></label>
+          <input type="email" name="email" id="email" class="form-control" formControlName="email">
+          <ng-container *ngIf="reactiveForm.get('email').touched">
+            <small *ngIf="reactiveForm.get('email').hasError('required'); else email">
+              *Email is required
+            </small>
+            <ng-template #email>
+              <small *ngIf="reactiveForm.get('email').hasError('email')">
+                *Email is Invalid
+              </small>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+      <div class="container address " formArrayName="address">
+        <h4><b>Address</b></h4>
+        <div class="row border-rounded shadow p-2 bg-light border-rounded shadow my-2"
+          *ngFor="let control of reactiveForm.get('address')['controls']; let i =index" [formGroupName]="i">
+          <div class="col-lg-4">
+            <label for="street"><b>Street</b></label>
+            <input type="text" name="street" class="form-control" formControlName="street">
+            <ng-container *ngIf="reactiveForm.get('address')['controls'][i].get('street').touched">
+              <small *ngIf="reactiveForm.get('address')['controls'][i].get('street').hasError('required'); else pattern">
+                *Street is Required Feild
+              </small>
+              <ng-template #pattern>
+                <small *ngIf="reactiveForm.get('address')['controls'][i].get('street').hasError('pattern')">
+                  *Street should only contents alphabets
+                </small>
+              </ng-template>
+            </ng-container>
+          </div>
+          <div class="col-lg-2">
+            <label for="city"><b>City</b></label>
+            <input type="text" name="city" class="form-control" formControlName="city">
+            <ng-container *ngIf="reactiveForm.get('address')['controls'][i].get('city').touched">
+              <small *ngIf="reactiveForm.get('address')['controls'][i].get('city').hasError('required'); else pattern">
+                *City is Required Feild
+              </small>
+              <ng-template #pattern>
+                <small *ngIf="reactiveForm.get('address')['controls'][i].get('city').hasError('pattern')">
+                  *City should only contents alphabets
+                </small>
+              </ng-template>
+            </ng-container>
+          </div>
+          <div class="col-lg-2">
+            <label for="state"><b>State</b></label>
+            <input type="text" name="state" class="form-control" formControlName="state">
+            <ng-container *ngIf="reactiveForm.get('address')['controls'][i].get('state').touched">
+              <small *ngIf="reactiveForm.get('address')['controls'][i].get('state').hasError('required'); else pattern">
+                *State is Required Feild
+              </small>
+              <ng-template #pattern>
+                <small *ngIf="reactiveForm.get('address')['controls'][i].get('state').hasError('pattern')">
+                  *State should only contents alphabets
+                </small>
+              </ng-template>
+            </ng-container>
+          </div>
+          <div class="col-lg-2">
+            <label for="zip"><b>Zip Code</b></label>
+            <input type="number" name="zip" class="form-control" formControlName="zip">
+            <ng-container *ngIf="reactiveForm.get('address')['controls'][i].get('zip').touched">
+              <small *ngIf="reactiveForm.get('address')['controls'][i].get('zip').hasError('required'); else maxLength">
+                *Zip Code is Required Feild
+              </small>
+              <ng-template #maxLength>
+                <small *ngIf="reactiveForm.get('address')['controls'][i].get('zip').hasError('maxLength'); else minLength">
+                  *Zip Code should only contents maximum 6 digits
+                </small>
+              </ng-template>
+              <ng-template #minLength>
+                <small *ngIf="reactiveForm.get('address')['controls'][i].get('zip').hasError('minLength')">
+                  *Zip Code should only contents minimum 5 digits
+                </small>
+              </ng-template>
+            </ng-container>
+          </div>
+          <div class="col-lg-2">
+            <button type="button" class="btn-delete mt-3 btn btn-danger" (click)="deleteAddress(i)">
+              Delete
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn-add my-2 btn btn-success" (click)="addAddress()">
+          Add
+        </button><br>
+      </div>
+      <div class="footer d-flex">
+        <div class="m-1">
+          <input type="submit" value="Submit" class="submit-btn my-2 btn btn-primary">
+        </div>
+        <div class="m-1">
+          <input type="reset" value="Reset" class="reset-btn my-2 btn btn-warning" (click)="onReset()">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="container bg-light border-rounded shadow m-2 align-items-center ">
+    <div class="header text-center">
+      <h2>User Address Data</h2>
+    </div>
+    <table class="table table-striped text-center">
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+      <tr *ngFor="let user of listData">
+        <td>{{user.username}}</td>
+        <td>{{user.email}}</td>
+        <td><button class="edit btn btn-primary m-1" (click)="onSelectUserEdit(user)">Edit</button><button class="delete btn btn-danger m-1" (click)="onSelectUserDelete(user)">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
