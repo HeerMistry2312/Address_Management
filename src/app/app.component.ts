@@ -9,9 +9,8 @@ import { User } from './interface/user';
 })
 export class AppComponent {
   title = 'Adress_Management';
-
   users: User[] = [];
-  constructor(private snackbar: MatSnackBar){}
+  constructor(private snackbar: MatSnackBar) {}
 
   ngOnInit() {
     this.loadUsersFromLocalStorage();
@@ -25,15 +24,29 @@ export class AppComponent {
   }
 
   selectedUserForEdit(data: User) {
-    const username = data.username
-    this.snackbar.open(`${username} Updated Successful!!!`, 'Close', {
-      duration: 3000,
-    });
+    const index = this.users.findIndex((u) => u.userid === data.userid);
+    console.log(index);
+    if (index !== -1) {
+      this.users[index] = data;
+      this.snackbar.open(`${data.username} Updated Successfully!`, 'Close', {
+        duration: 3000,
+      });
+    } else {
+      this.users.push(data);
+      this.snackbar.open(`${data.username} Added Successfully!`, 'Close', {
+        duration: 3000,
+      });
+    }
+    localStorage.setItem('users', JSON.stringify(this.users));
   }
- selectUserForDelete(data:User){
-  const username = data.username
-  this.snackbar.open(`${username} Deleted Successful!!!`, 'Close', {
-    duration: 3000,
-  });
- }
+  selectUserForDelete(data: User) {
+    const index = this.users.findIndex((u) => u.userid === data.userid);
+    if (index !== -1) {
+      this.users.splice(index, 1);
+      localStorage.setItem('users', JSON.stringify(this.users));
+      this.snackbar.open(`${data.username} Deleted Successfully!`, 'Close', {
+        duration: 3000,
+      });
+    }
+  }
 }

@@ -4,6 +4,7 @@ import {
   Input,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import {
@@ -22,17 +23,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./usermanager.component.scss'],
 })
 export class UsermanagerComponent implements OnInit {
-  reactiveForm: FormGroup;
-  list: User[] = [];
-  formdata: User;
+  userAddressForm: FormGroup;
   @Input() listData: User[] = [];
-
   @Output() selectUserForEdit: EventEmitter<User> = new EventEmitter<User>();
   @Output() selectUserForDelete: EventEmitter<User> = new EventEmitter<User>();
   constructor(private fb: FormBuilder, private snackbar: MatSnackBar) {}
 
   ngOnInit(): void {
-    this.reactiveForm = this.fb.group({
+    this.userAddressForm = this.fb.group({
       userid: [null, [Validators.required, Validators.maxLength(3)]],
       username: [
         null,
@@ -43,6 +41,23 @@ export class UsermanagerComponent implements OnInit {
         [this.createAddressFormGroup()],
         Validators.required
       ),
+    });
+  }
+
+  populateForm(user: User) {
+    this.userAddressForm.patchValue({
+      userid: user.userid,
+      username: user.username,
+      email: user.email,
+    });
+
+    const addressArray = this.userAddressForm.get('address') as FormArray;
+    while (addressArray.length !== 0) {
+      addressArray.removeAt(0);
+    }
+
+    user.address.forEach((address: Address) => {
+      addressArray.push(this.createAddressFormGroup(address));
     });
   }
 
@@ -62,17 +77,16 @@ export class UsermanagerComponent implements OnInit {
       ],
       zip: [
         address ? address.zip : null,
-        [Validators.required, Validators.minLength(5),Validators.maxLength(6)],
+        [Validators.required, Validators.minLength(5), Validators.maxLength(6)],
       ],
     });
   }
 
   onSubmit() {
-    if (this.reactiveForm.valid) {
-      this.formdata = this.reactiveForm.value;
-      this.list.push(this.formdata);
-      localStorage.setItem('users', JSON.stringify(this.list));
-      this.reactiveForm.reset();
+    if (this.userAddressForm.valid) {
+      const formdata: User = this.userAddressForm.value;
+      this.selectUserForEdit.emit(formdata);
+      this.userAddressForm.reset();
     } else {
       this.snackbar.open(`Please Fill all valid Details!!!`, 'Close', {
         duration: 3000,
@@ -81,44 +95,27 @@ export class UsermanagerComponent implements OnInit {
   }
 
   addAddress() {
-    (this.reactiveForm.get('address') as FormArray).push(
+    (this.userAddressForm.get('address') as FormArray).push(
       this.createAddressFormGroup()
     );
   }
 
   deleteAddress(i: number) {
-    const controls = this.reactiveForm.get('address') as FormArray;
-    controls.removeAt(i);
+    if (i > 0) {
+      const controls = this.userAddressForm.get('address') as FormArray;
+      controls.removeAt(i);
+    } else {
+      this.snackbar.open(`Cannot delete the first address.`, 'Close', {
+        duration: 3000,
+      });
+    }
   }
 
   onReset() {
-    this.reactiveForm.reset();
-  }
-
-  onSelectUserEdit(user: User) {
-    this.reactiveForm.reset();
-    this.reactiveForm.patchValue({
-      userid: user.userid,
-      username: user.username,
-      email: user.email,
-    });
-
-    const addressArray = this.reactiveForm.get('address') as FormArray;
-    while (addressArray.length !== 0) {
-      addressArray.removeAt(0);
-    }
-
-    user.address.forEach((address: Address) => {
-      addressArray.push(this.createAddressFormGroup(address));
-    });
-
-    this.selectUserForEdit.emit(user);
+    this.userAddressForm.reset();
   }
 
   onSelectUserDelete(user: User) {
-    const index = this.listData.indexOf(user);
-    this.listData.splice(index, 1);
-    localStorage.setItem('users', JSON.stringify(this.listData));
     this.selectUserForDelete.emit(user);
   }
 }

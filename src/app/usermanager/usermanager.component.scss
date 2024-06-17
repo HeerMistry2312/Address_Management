@@ -1,5 +1,7 @@
 @import 'src/styles.scss';
-
+span{
+  color: $delete-button-color;
+}
 small {
   color: red;
   font-weight: bold;
